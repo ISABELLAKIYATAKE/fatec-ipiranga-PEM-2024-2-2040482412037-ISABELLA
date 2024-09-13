@@ -1,0 +1,140 @@
+/*--------------------------------------------------------*
+* Disciplina: Programaçao Estruturada e Modular *
+*          Prof. Carlos Veríssimo                                    *
+*--------------------------------------------------------*
+* Objetivo do Programa: implementação da jogada "XEQUE-PASTOR"     *
+* Data - 04/09/2024                                               * 
+* Autor: Isabella Sanae Kiyatake*
+*--------------------------------------------------------*/
+
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char identificador[4];  
+    int pontos;             
+} Peca;
+
+void inicializarTabuleiro(Peca tabuleiro[8][8]) {
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            strcpy(tabuleiro[i][j].identificador, "X");
+            tabuleiro[i][j].pontos = 0;
+        }
+    }
+
+    // Peças brancas
+    strcpy(tabuleiro[0][0].identificador, "BT1"); tabuleiro[0][0].pontos = 5;
+    strcpy(tabuleiro[0][1].identificador, "BC1"); tabuleiro[0][1].pontos = 3;
+    strcpy(tabuleiro[0][2].identificador, "BB1"); tabuleiro[0][2].pontos = 3;
+    strcpy(tabuleiro[0][3].identificador, "BD");  tabuleiro[0][3].pontos = 9;
+    strcpy(tabuleiro[0][4].identificador, "BR");  tabuleiro[0][4].pontos = 0;
+    strcpy(tabuleiro[0][5].identificador, "BB2"); tabuleiro[0][5].pontos = 3;
+    strcpy(tabuleiro[0][6].identificador, "BC2"); tabuleiro[0][6].pontos = 3;
+    strcpy(tabuleiro[0][7].identificador, "BT2"); tabuleiro[0][7].pontos = 5;
+    for (int i = 0; i < 8; i++) {
+        sprintf(tabuleiro[1][i].identificador, "BP%d", i + 1);
+        tabuleiro[1][i].pontos = 1;
+    }
+
+    // Peças pretas
+    for (int i = 0; i < 8; i++) {
+        sprintf(tabuleiro[6][i].identificador, "PP%d", i + 1);
+        tabuleiro[6][i].pontos = 1;
+    }
+    strcpy(tabuleiro[7][0].identificador, "PT1"); tabuleiro[7][0].pontos = 5;
+    strcpy(tabuleiro[7][1].identificador, "PC1"); tabuleiro[7][1].pontos = 3;
+    strcpy(tabuleiro[7][2].identificador, "PB1"); tabuleiro[7][2].pontos = 3;
+    strcpy(tabuleiro[7][3].identificador, "PD");  tabuleiro[7][3].pontos = 9;
+    strcpy(tabuleiro[7][4].identificador, "PR");  tabuleiro[7][4].pontos = 0;
+    strcpy(tabuleiro[7][5].identificador, "PB2"); tabuleiro[7][5].pontos = 3;
+    strcpy(tabuleiro[7][6].identificador, "PC2"); tabuleiro[7][6].pontos = 3;
+    strcpy(tabuleiro[7][7].identificador, "PT2"); tabuleiro[7][7].pontos = 5;
+}
+
+void imprimirTabuleiro(Peca tabuleiro[8][8]) {
+    char letrasColunas[] = "abcdefgh";
+
+    printf("   ");  // Espaço para o índice das colunas
+    for (int i = 0; i < 8; i++) {
+        printf("%4c", letrasColunas[i]);  // Imprimir letras das colunas
+    }
+    printf("\n");
+
+    for (int i = 0; i < 8; i++) {
+        printf("%d  ", 8 - i);  // Imprimir número da linha
+        for (int j = 0; j < 8; j++) {
+            printf("%4s", tabuleiro[i][j].identificador);
+        }
+        printf("\n");
+    }
+}
+
+void moverPeca(Peca tabuleiro[8][8], int origX, int origY, int destX, int destY) {
+    strcpy(tabuleiro[destX][destY].identificador, tabuleiro[origX][origY].identificador);
+    strcpy(tabuleiro[origX][origY].identificador, "...");
+}
+
+void executarJogadas(Peca tabuleiro[8][8]) {
+    // Jogada #1
+    printf("Jogada #1:\n");
+    printf("Antes do movimento:\n");
+    imprimirTabuleiro(tabuleiro);
+    
+    printf("Movendo Peão do Rei (e2 -> e4) ... ");
+    moverPeca(tabuleiro, 1, 4, 3, 4);
+    printf("Feito!\n");
+    
+    printf("Pretas jogam Peão do Rei (e7 -> e5) ... ");
+    moverPeca(tabuleiro, 6, 4, 4, 4);
+    printf("Feito!\n");
+    imprimirTabuleiro(tabuleiro);
+
+    // Jogada #2
+    printf("Jogada #2:\n");
+    printf("Antes do movimento:\n");
+    imprimirTabuleiro(tabuleiro);
+    
+    printf("Movendo Bispo do Rei (f1 -> c4) ... ");
+    moverPeca(tabuleiro, 0, 5, 2, 2);
+    printf("Feito!\n");
+    
+    printf("Pretas jogam Cavalo da Dama (b8 -> c6) ... ");
+    moverPeca(tabuleiro, 7, 1, 5, 2);
+    printf("Feito!\n");
+    imprimirTabuleiro(tabuleiro);
+
+    // Jogada #3
+    printf("Jogada #3:\n");
+    printf("Antes do movimento:\n");
+    imprimirTabuleiro(tabuleiro);
+    
+    printf("Movendo Dama (d1 -> h5) ... ");
+    moverPeca(tabuleiro, 0, 3, 4, 7);
+    printf("Feito!\n");
+    
+    printf("Pretas jogam Cavalo do Rei (g8 -> f6) ... ");
+    moverPeca(tabuleiro, 7, 6, 5, 5);
+    printf("Feito!\n");
+    imprimirTabuleiro(tabuleiro);
+
+    // Jogada #4 (Xeque Mate)
+    printf("Jogada #4:\n");
+    printf("Antes do movimento:\n");
+    imprimirTabuleiro(tabuleiro);
+    
+    printf("Movendo Dama (h5 -> f7) e dando Xeque Mate ... ");
+    moverPeca(tabuleiro, 4, 7, 5, 6);
+    strcpy(tabuleiro[5][6].identificador, "DF7#"); // Marca o xeque mate
+    printf("Feito!\n");
+    imprimirTabuleiro(tabuleiro);
+}
+
+int main() {
+    Peca tabuleiro[8][8];  // Tabuleiro 8x8 com cada posição contendo uma estrutura Peca
+
+    inicializarTabuleiro(tabuleiro); 
+    executarJogadas(tabuleiro);    
+
+    return 0;
+}
