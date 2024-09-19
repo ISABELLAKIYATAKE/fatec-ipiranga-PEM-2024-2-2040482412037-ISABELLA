@@ -1,0 +1,120 @@
+/*--------------------------------------------------------*
+* Disciplina: Programaçao Estruturada e Modular *
+*          Prof. Carlos Veríssimo                                    *
+*--------------------------------------------------------*
+* Objetivo do Programa: implementação da calculadora HP12c     *
+* Data - 19/09/2024                                               * 
+* Autor: Isabella Sanae Kiyatake
+*--------------------------------------------------------*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_PILHA 4
+
+typedef struct {
+    double dados[MAX_PILHA];
+    int topo;
+} Pilha;
+
+// Funções da pilha
+void inicializaPilha(Pilha *p) {
+    p->topo = -1;
+}
+
+int pilhaCheia(Pilha *p) {
+    return p->topo == MAX_PILHA - 1;
+}
+
+int pilhaVazia(Pilha *p) {
+    return p->topo == -1;
+}
+
+void empilha(Pilha *p, double valor) {
+    if (!pilhaCheia(p)) {
+        p->dados[++p->topo] = valor;
+    } else {
+        printf("Erro: Pilha cheia!\n");
+    }
+}
+
+double desempilha(Pilha *p) {
+    if (!pilhaVazia(p)) {
+        return p->dados[p->topo--];
+    } else {
+        printf("Erro: Pilha vazia!\n");
+        return 0; // Retorna 0 em caso de erro
+    }
+}
+
+// Função para calcular o resultado
+double calcular(Pilha *p, char operador) {
+    double b = desempilha(p);
+    double a = desempilha(p);
+    switch (operador) {
+        case '+':
+            return a + b;
+        case '-':
+            return a - b;
+        case '*':
+            return a * b;
+        case '/':
+            if (b != 0) return a / b;
+            else {
+                printf("Erro: Divisão por zero!\n");
+                return 0;
+            }
+        default:
+            printf("Erro: Operador inválido!\n");
+            return 0;
+    }
+}
+
+// Função para processar a entrada em RPN
+void processarRPN(char *entrada) {
+    Pilha pilha;
+    inicializaPilha(&pilha);
+    
+    char *token = strtok(entrada, " ");
+    while (token != NULL) {
+        if (isdigit(token[0]) || (token[0] == '-' && isdigit(token[1]))) {
+            empilha(&pilha, atof(token)); // Adiciona o número na pilha
+        } else if (strlen(token) == 1) {
+            double resultado = calcular(&pilha, token[0]);
+            empilha(&pilha, resultado); // Empilha o resultado
+        } else {
+            printf("Erro: Entrada inválida!\n");
+            return;
+        }
+        token = strtok(NULL, " ");
+    }
+    
+    if (!pilhaVazia(&pilha)) {
+        printf("Resultado: %.2f\n", desempilha(&pilha));
+    } else {
+        printf("Erro: Sem resultados na pilha!\n");
+    }
+}
+
+int main() {
+    char entrada[100];
+    char continuar;
+
+    do {
+        printf("Digite a expressão em RPN (max 4 operandos seguidos de operador): ");
+        fgets(entrada, sizeof(entrada), stdin);
+        entrada[strcspn(entrada, "\n")] = 0; // Remove nova linha
+
+        processarRPN(entrada);
+
+        printf("Deseja fazer uma nova entrada? (s/n): ");
+        scanf(" %c", &continuar);
+        getchar(); // Consome o '\n' após o scanf
+    } while (continuar == 's' || continuar == 'S');
+
+    printf("Obrigado por usar nossa Calculadora Fatec-HP12c\n");
+    return 0;
+}
+
