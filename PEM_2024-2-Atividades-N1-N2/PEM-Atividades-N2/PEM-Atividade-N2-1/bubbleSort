@@ -1,0 +1,65 @@
+/*--------------------------------------------------------*
+* Disciplina: Programaçao Estruturada e Modular *
+*          Prof. Carlos Veríssimo                                    *
+*--------------------------------------------------------*
+* Objetivo do Programa: bubbleSort     *
+* Data - 27/09/2024                                               * 
+* Autor: Isabella Sanae Kiyatake*
+*--------------------------------------------------------*/
+
+#include <stdio.h>
+
+// Função para trocar dois valores
+void swap(int *xp, int *yp) {
+    int temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+// Função para imprimir o array
+void printArray(int arr[], int n) {
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+}
+
+// Função para aplicar o Bubble Sort
+void bubbleSort(int arr[], int n) {
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                swap(&arr[j], &arr[j+1]);
+            }
+        }
+    }
+}
+
+// Função principal
+int main() {
+    int n;
+
+    // Solicitar a quantidade de elementos
+    printf("Digite o número de elementos: ");
+    scanf("%d", &n);
+
+    int arr[n];
+
+    // Entrada dos elementos no array
+    printf("Digite %d números:\n", n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    // Mostrar o array original
+    printf("Array original: ");
+    printArray(arr, n);
+
+    // Aplicar o Bubble Sort
+    bubbleSort(arr, n);
+
+    // Mostrar o array ordenado
+    printf("Array ordenado: ");
+    printArray(arr, n);
+
+    return 0;
+}
