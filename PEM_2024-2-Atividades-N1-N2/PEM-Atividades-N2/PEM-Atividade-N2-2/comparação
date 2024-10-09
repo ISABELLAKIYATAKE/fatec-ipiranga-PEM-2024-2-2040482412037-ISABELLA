@@ -1,0 +1,88 @@
+/*--------------------------------------------------------*
+* Disciplina: Programaçao Estruturada e Modular *
+*          Prof. Carlos Veríssimo                                    *
+*--------------------------------------------------------*
+* Objetivo do Programa: comparação de bublesort     *
+* Data - 04/09/2024                                               * 
+* Autor: Isabella Sanae Kiyatake*
+*--------------------------------------------------------*/
+
+#include <stdio.h>
+#include <time.h>  // Para usar clock()
+
+// Função para trocar dois valores
+void swap(int *xp, int *yp) {
+    int temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+// Função para imprimir o array
+void printArray(int arr[], int n) {
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+}
+
+// Função para aplicar o Bubble Sort com contagem de trocas e ciclos
+void bubbleSort(int arr[], int n, int *num_swaps, int *num_cycles) {
+    *num_swaps = 0;  // Inicializa a contagem de trocas
+    *num_cycles = 0; // Inicializa a contagem de ciclos
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            (*num_cycles)++;  // Conta o ciclo
+            if (arr[j] > arr[j+1]) {
+                swap(&arr[j], &arr[j+1]);
+                (*num_swaps)++;  // Conta a troca
+            }
+        }
+    }
+}
+
+// Função principal
+int main() {
+    int arr[] = {
+        5, 3, 8, 4, 2,
+        115, 113, 118, 114, 112,
+        125, 123, 128, 124, 122,
+        35, 33, 38, 34, 32,
+        45, 43, 48, 44, 42,
+        55, 53, 58, 54, 52,
+        65, 63, 68, 64, 62,
+        75, 73, 78, 74, 72,
+        85, 83, 88, 84, 82,
+        95, 93, 98, 94, 92,
+        15, 13, 18, 14, 12,
+        25, 23, 28, 24, 22
+    };
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    // Mostrar o array original
+    printf("Array original: ");
+    printArray(arr, n);
+
+    // Variáveis para medir o tempo, trocas e ciclos
+    clock_t start, end;
+    double cpu_time_used;
+    int num_swaps, num_cycles;
+
+    // Medir o tempo de execução
+    start = clock();
+
+    //-----------------------
+    bubbleSort(arr, n, &num_swaps, &num_cycles);
+    //-----------------------
+
+    end = clock();
+
+    cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Tempo de execução: %f segundos\n", cpu_time_used);
+    printf("Número de trocas realizadas: %d\n", num_swaps);
+    printf("Número total de ciclos: %d\n", num_cycles);
+
+    // Mostrar o array ordenado
+    printf("Array ordenado: ");
+    printArray(arr, n);
+
+    return 0;
+}
