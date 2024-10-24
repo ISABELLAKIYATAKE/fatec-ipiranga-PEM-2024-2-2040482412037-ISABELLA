@@ -1,0 +1,166 @@
+/*--------------------------------------------------------*
+* Disciplina: Programaçao Estruturada e Modular *
+*          Prof. Carlos Veríssimo                                    *
+*--------------------------------------------------------*
+* Objetivo do Programa: loja de produtos eletrodomesticos     *
+* Data - 24/10/2024                                               * 
+* Autor: Isabella Sanae Kiyatake*
+*--------------------------------------------------------*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_PRODUTOS 100
+#define MAX_NOME 50
+#define MAX_DESC 100
+
+// Estrutura para representar um produto
+typedef struct {
+    int id;
+    char nome[MAX_NOME];
+    char descricao[MAX_DESC];
+    float preco;
+    int estoque;
+} Produto;
+
+int total_produtos = 0;
+Produto produtos[MAX_PRODUTOS];
+
+// Funções do programa
+void inserir_produto();
+void listar_produtos();
+void comprar_produto();
+void ordenar_produtos_por_nome();
+Produto* buscar_produto_por_id(int id);
+
+int main() {
+    int opcao;
+
+    do {
+        printf("\n----- MENU LOJA DE PRODUTOS ELETRÔNICOS -----\n");
+        printf("1. Inserir produto\n");
+        printf("2. Listar produtos\n");
+        printf("3. Comprar produto\n");
+        printf("4. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                inserir_produto();
+                break;
+            case 2:
+                listar_produtos();
+                break;
+            case 3:
+                comprar_produto();
+                break;
+            case 4:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida!\n");
+        }
+    } while (opcao != 4);
+
+    return 0;
+}
+
+// Função para inserir um novo produto na lista
+void inserir_produto() {
+    if (total_produtos >= MAX_PRODUTOS) {
+        printf("Capacidade máxima de produtos atingida!\n");
+        return;
+    }
+
+    Produto novo_produto;
+    novo_produto.id = total_produtos + 1;
+
+    printf("\nInserindo Produto ID: %d\n", novo_produto.id);
+    printf("Nome do produto: ");
+    getchar(); // Limpar buffer
+    fgets(novo_produto.nome, MAX_NOME, stdin);
+    novo_produto.nome[strcspn(novo_produto.nome, "\n")] = '\0'; // Remover \n
+
+    printf("Descrição do produto: ");
+    fgets(novo_produto.descricao, MAX_DESC, stdin);
+    novo_produto.descricao[strcspn(novo_produto.descricao, "\n")] = '\0'; // Remover \n
+
+    printf("Preço unitário: ");
+    scanf("%f", &novo_produto.preco);
+
+    printf("Quantidade em estoque: ");
+    scanf("%d", &novo_produto.estoque);
+
+    produtos[total_produtos] = novo_produto;
+    total_produtos++;
+
+    ordenar_produtos_por_nome(); // Ordena a lista de produtos após inserir
+
+    printf("Produto inserido com sucesso!\n");
+}
+
+// Função para listar produtos
+void listar_produtos() {
+    if (total_produtos == 0) {
+        printf("Nenhum produto cadastrado.\n");
+        return;
+    }
+
+    printf("\nLista de Produtos:\n");
+    for (int i = 0; i < total_produtos; i++) {
+        printf("ID: %d | Nome: %s | Preço: R$ %.2f | Estoque: %d\n",
+               produtos[i].id, produtos[i].nome, produtos[i].preco, produtos[i].estoque);
+    }
+}
+
+// Função para comprar um produto
+void comprar_produto() {
+    int id, quantidade;
+    Produto *produto;
+
+    printf("\nDigite o ID do produto que deseja comprar: ");
+    scanf("%d", &id);
+
+    produto = buscar_produto_por_id(id);
+
+    if (produto == NULL) {
+        printf("Produto inexistente!\n");
+        return;
+    }
+
+    printf("Quantidade desejada: ");
+    scanf("%d", &quantidade);
+
+    if (quantidade > produto->estoque) {
+        printf("Estoque insuficiente! Estoque atual: %d\n", produto->estoque);
+        return;
+    }
+
+    produto->estoque -= quantidade;
+    printf("Compra realizada com sucesso! Restante em estoque: %d\n", produto->estoque);
+}
+
+// Função para ordenar produtos por nome usando Bubble Sort
+void ordenar_produtos_por_nome() {
+    for (int i = 0; i < total_produtos - 1; i++) {
+        for (int j = 0; j < total_produtos - i - 1; j++) {
+            if (strcmp(produtos[j].nome, produtos[j + 1].nome) > 0) {
+                Produto temp = produtos[j];
+                produtos[j] = produtos[j + 1];
+                produtos[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Função para buscar um produto por ID
+Produto* buscar_produto_por_id(int id) {
+    for (int i = 0; i < total_produtos; i++) {
+        if (produtos[i].id == id) {
+            return &produtos[i];
+        }
+    }
+    return NULL;
+}
