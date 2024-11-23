@@ -1,0 +1,258 @@
+/*--------------------------------------------------------*
+* Disciplina: Programaçao Estruturada e Modular *
+*          Prof. Carlos Veríssimo                                    *
+*--------------------------------------------------------*
+* Objetivo do Programa: analise critica de codigo e codigo refatorado    *
+* Data - 23/11/2024                                              * 
+* Autor: Isabella Sanae Kiyatake*
+*--------------------------------------------------------*/
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+ 
+#define MAXPRODUTOS 50
+ 
+typedef struct {
+    int ID;
+    char nomeProduto[50];
+    int quantidadeEmEstoque;
+    double valorDoProduto;
+} Produto;
+ 
+// Funções de manipulação de produtos
+void cadastrarProduto(Produto *listaProdutos, int *contadorProduto);
+void alterarProduto(Produto *listaProdutos, int ID, int contadorProduto);
+void consultarProduto(Produto *listaProdutos, int ID, int contadorProduto);
+void excluirProduto(Produto *listaProdutos, int ID, int *contadorProduto);
+void venderProduto(Produto *listaProdutos, int ID, int quantidade, int contadorProduto);
+void aplicarDescontoProduto(Produto *listaProdutos, int ID, int contadorProduto);
+ 
+// Funções auxiliares
+void imprimirDados(Produto *produto);
+void imprimirLista(Produto *listaProdutos, int contadorProduto);
+int validarEntradaInteiro(int minValue);
+double validarEntradaDouble(double minValue);
+int buscarProdutoPorID(Produto *listaProdutos, int contadorProduto, int ID);
+void limparBuffer();
+ 
+// Função principal
+int main() {
+    Produto listaProdutos[MAXPRODUTOS];
+    int contadorProduto = 0;
+    int opcao, ID, quantidade;
+ 
+    do {
+        printf("------ * MENU * ------\n");
+        printf("1. Cadastrar produto\n");
+        printf("2. Alterar dados do produto\n");
+        printf("3. Consultar produto\n");
+        printf("4. Excluir Produto\n");
+        printf("5. Consultar lista de produtos\n");
+        printf("6. Vender produto\n");
+        printf("7. Dar desconto a um produto\n");
+        printf("8. Encerrar o programa\n");
+        printf("Escolha uma opcao: ");
+        scanf(" %d", &opcao);
+        limparBuffer();
+ 
+        switch (opcao) {
+            case 1: 
+                cadastrarProduto(listaProdutos, &contadorProduto); 
+                break;
+            case 2: 
+                printf("\nDigite o ID do produto que será alterado: ");
+                scanf(" %d", &ID);
+                limparBuffer();
+                alterarProduto(listaProdutos, ID, contadorProduto);
+                break;
+            case 3: 
+                printf("\nDigite o ID do produto que deseja consultar: ");
+                scanf(" %d", &ID);
+                limparBuffer();
+                consultarProduto(listaProdutos, ID, contadorProduto);
+                break;
+            case 4: 
+                printf("\nDigite o ID do produto que deseja excluir: ");
+                scanf(" %d", &ID);
+                limparBuffer();
+                excluirProduto(listaProdutos, ID, &contadorProduto);
+                break;
+            case 5: 
+                imprimirLista(listaProdutos, contadorProduto); 
+                break;
+            case 6: 
+                printf("\nDigite o ID do produto que deseja vender: ");
+                scanf(" %d", &ID);
+                printf("Digite a quantidade que será vendida: ");
+                quantidade = validarEntradaInteiro(1);
+                venderProduto(listaProdutos, ID, quantidade, contadorProduto);
+                break;
+            case 7: 
+                printf("\nDigite o ID do produto que receberá desconto: ");
+                scanf(" %d", &ID);
+                limparBuffer();
+                aplicarDescontoProduto(listaProdutos, ID, contadorProduto);
+                break;
+            case 8: 
+                printf("\nObrigado por usar o nosso programa na sua loja!\n");
+                printf("Encerrando a sua execução...\n");
+                break;
+            default: 
+                printf("\nO valor digitado nao é valido. Digite novamente.\n\n");
+                break;
+        }
+ 
+    } while (opcao != 8);
+ 
+    return 0;
+}
+ 
+// Função para cadastrar um novo produto
+void cadastrarProduto(Produto *listaProdutos, int *contadorProduto) {
+    Produto *produto = &listaProdutos[*contadorProduto];
+    produto->ID = *contadorProduto + 1;
+ 
+    printf("\nDigite o nome do produto: ");
+    scanf(" %[^\n]", produto->nomeProduto);
+    printf("Digite a quantidade em estoque do produto: ");
+    produto->quantidadeEmEstoque = validarEntradaInteiro(0);
+ 
+    printf("Digite o valor do produto: ");
+    produto->valorDoProduto = validarEntradaDouble(0);
+ 
+    (*contadorProduto)++;
+    printf("Produto adicionado com sucesso!\n\n");
+}
+ 
+// Função para imprimir dados de um único produto
+void imprimirDados(Produto *produto) {
+    printf("\nID: %d\n", produto->ID);
+    printf("Nome: %s\n", produto->nomeProduto);
+    printf("Quantidade em estoque: %d\n", produto->quantidadeEmEstoque);
+    printf("Valor do produto: %.2f\n\n", produto->valorDoProduto);
+}
+ 
+// Função para alterar os dados de um produto
+void alterarProduto(Produto *listaProdutos, int ID, int contadorProduto) {
+    int index = buscarProdutoPorID(listaProdutos, contadorProduto, ID);
+    if (index != -1) {
+        printf("\nDados atuais do produto:\n");
+        imprimirDados(&listaProdutos[index]);
+ 
+        printf("\nDigite o novo nome do produto: ");
+        scanf(" %[^\n]", listaProdutos[index].nomeProduto);
+        printf("Digite a nova quantidade em estoque do produto: ");
+        listaProdutos[index].quantidadeEmEstoque = validarEntradaInteiro(0);
+        printf("Digite o novo valor do produto: ");
+        listaProdutos[index].valorDoProduto = validarEntradaDouble(0);
+ 
+        printf("Produto alterado com sucesso!\n\n");
+    } else {
+        printf("Produto com o ID %d nao encontrado.\n\n", ID);
+    }
+}
+ 
+// Função para consultar os dados de um produto
+void consultarProduto(Produto *listaProdutos, int ID, int contadorProduto) {
+    int index = buscarProdutoPorID(listaProdutos, contadorProduto, ID);
+    if (index != -1) {
+        imprimirDados(&listaProdutos[index]);
+    } else {
+        printf("Produto com o ID %d nao encontrado.\n\n", ID);
+    }
+}
+ 
+// Função para excluir um produto
+void excluirProduto(Produto *listaProdutos, int ID, int *contadorProduto) {
+    int index = buscarProdutoPorID(listaProdutos, *contadorProduto, ID);
+    if (index != -1) {
+        for (int i = index; i < *contadorProduto - 1; i++) {
+            listaProdutos[i] = listaProdutos[i + 1];
+        }
+        (*contadorProduto)--;
+        printf("Produto excluido com sucesso!\n\n");
+    } else {
+        printf("Produto com o ID %d nao encontrado.\n\n", ID);
+    }
+}
+ 
+// Função para vender um produto
+void venderProduto(Produto *listaProdutos, int ID, int quantidade, int contadorProduto) {
+    int index = buscarProdutoPorID(listaProdutos, contadorProduto, ID);
+    if (index != -1) {
+        if (listaProdutos[index].quantidadeEmEstoque >= quantidade) {
+            double precoTotal = listaProdutos[index].valorDoProduto * quantidade;
+            printf("Preco da venda: %.2f\n", precoTotal);
+            listaProdutos[index].quantidadeEmEstoque -= quantidade;
+            printf("Produto vendido com sucesso!\n\n");
+        } else {
+            printf("Estoque insuficiente para realizar a venda.\n\n");
+        }
+    } else {
+        printf("Produto com o ID %d nao encontrado.\n\n", ID);
+    }
+}
+ 
+// Função para aplicar desconto a um produto
+void aplicarDescontoProduto(Produto *listaProdutos, int ID, int contadorProduto) {
+    int index = buscarProdutoPorID(listaProdutos, contadorProduto, ID);
+    if (index != -1) {
+        double desconto;
+        printf("\nDigite o desconto em porcentagem: ");
+        desconto = validarEntradaDouble(0);
+ 
+        listaProdutos[index].valorDoProduto *= (1 - desconto / 100);
+        printf("Novo valor do produto: %.2f\n", listaProdutos[index].valorDoProduto);
+        printf("Desconto aplicado com sucesso!\n\n");
+    } else {
+        printf("Produto com o ID %d nao encontrado.\n\n", ID);
+    }
+}
+ 
+// Função para imprimir lista de produtos
+void imprimirLista(Produto *listaProdutos, int contadorProduto) {
+    printf("\n------------- Lista de todos os produtos cadastrados -------------\n\n");
+    for (int i = 0; i < contadorProduto; i++) {
+        printf("ID: %d      Nome: %s\n", listaProdutos[i].ID, listaProdutos[i].nomeProduto);
+    }
+    printf("\n");
+}
+ 
+// Função para buscar um produto pelo ID
+int buscarProdutoPorID(Produto *listaProdutos, int contadorProduto, int ID) {
+    for (int i = 0; i < contadorProduto; i++) {
+        if (listaProdutos[i].ID == ID) {
+            return i;
+        }
+    }
+    return -1;  // Produto não encontrado
+}
+ 
+// Função para validar entrada de números inteiros
+int validarEntradaInteiro(int minValue) {
+    int value;
+    do {
+        scanf(" %d", &value);
+        if (value < minValue) {
+            printf("Valor inválido, tente novamente: ");
+        }
+    } while (value < minValue);
+    return value;
+}
+ 
+// Função para validar entrada de números decimais
+double validarEntradaDouble(double minValue) {
+    double value;
+    do {
+        scanf(" %lf", &value);
+        if (value < minValue) {
+            printf("Valor inválido, tente novamente: ");
+        }
+    } while (value < minValue);
+    return value;
+}
+ 
+// Função para limpar o buffer de entrada
+void limparBuffer() {
+    while (getchar() != '\n');
+}
